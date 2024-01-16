@@ -59,8 +59,11 @@ io.on("connection",(socket)=>{
     })
 
 
-    socket.on('disconnect',function(){
+    socket.on('disconnection',function(){
 		delete PLAYERS[id];
+        io.emit("state", { 
+            "players": Object.values(PLAYERS)
+        });
 	});
 
     setInterval(() => {
