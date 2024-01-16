@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ghosty</title>
+</head>
+
+<body>
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script type="module">
+        import kaboom from "https://unpkg.com/kaboom@3000.0.1/dist/kaboom.mjs";
+        document.querySelector("body").style.backgroundColor = "black";
+        kaboom({
+            background: "#000000",
+            width: window.innerWidth,
+            height: window.innerHeight
+        })
+
+
+        loadSprite("ghost", 'sprites/char.png');
+        loadSprite("tree", 'sprites/tree.png');
+        loadSprite("pinkTree", "sprites/pinkTree.png");
+        loadSprite("house", "sprites/house.png")
+        loadSprite("houseDown", "sprites/houseDown.png");
+        loadSprite("grass", "sprites/grass.png");
+        loadSprite("road", "sprites/path.png");
+        loadSprite("water", "sprites/water.png");
+        loadSprite("bridge", "sprites/bridge.png");
+        loadSprite("border", "sprites/border.png");
+        loadSprite("borderLeft", "sprites/borderLeft.png");
+        loadSprite("leftCorner", "sprites/leftCorner.png");
+        loadSprite("house1", "sprites/house1.png");
+        loadSprite("house2", "sprites/house2.png");
+        loadSprite("house3", "sprites/house3.png");
+        loadSprite("house4", "sprites/house4.png");
+        loadSprite("pathUp", "sprites/pathUp.png");
+        loadSprite("pathCorner", "sprites/pathCorner.png");
+        loadSprite("borderRight", "sprites/borderRight.png");
+        loadSprite("rightCorner", "sprites/rightCorner.png");
+        loadSprite("road3", "sprites/pathCorner3.png");
+        loadSprite("road2", "sprites/pathCorner2.png");
+        loadSprite("boat1", "sprites/boat1.png");
+        loadSprite("boat2", "sprites/boat2.png");
+
+        loadSpriteAtlas('/sprites/run.png', {
+            'emma': {
+                x: 0,
+                y: 0,
+                sliceX: 8,
+                anims: {
+                    'walk-down': { from: 0, to: 7, loop: true, speed: 15 }
+                }
+            }
+        })
+        scene("main", () => {
+            let socket = io();
+
+            //token
+            const token = localStorage.getItem("token") || "";
+            const name = localStorage.getItem("name");
+            socket.emit("checkToken", { token: token });
+            socket.on("correctToken", () => {
+                alert(`Welcome Back`);
+            })
+            socket.on("wrongToken", () => {
+                window.location.replace("/");
+            })
+            
+
+
+            //game
+
+            let objects = {};
+            socket.on("state", (e) => {
+                for (let i = 0; i < e.players.length; i++) {
+                    let playerData = e.players[i];
+                    if (!objects[playerData.id]) {
+                        objects[playerData.id] = add([
+                            sprite("ghost"),
+                            pos(playerData.x, playerData.y),
+                            area(),
+                            //     outline(),
+                            "player"
+                            //color(playerData.color[0], playerData.color[1], playerData.color[2]),
+                        ]);
+                    }
+                    let playerObject = objects[playerData.id];
+                    playerObject.pos.x = playerData.x;
+                    playerObject.pos.y = playerData.y;
+                }
+            });
+
+            onKeyDown("a", () => {
+                //player.move(-150, 0);
+                socket.emit("moveLeft");
+            });
+            onKeyDown("d", () => {
+                // player.move(150, 0);
+                socket.emit("moveRight");
+            });
+            onKeyDown("w", () => {
+                // player.move(0, -150);
+                socket.emit("moveUp");
+            });
+            onKeyDown("s", () => {
+                // player.move(0, 150);
+                socket.emit("moveDown");
+            });
+            
+
+            addLevel([
+                "++++++++++++++++++++++++++$",
+                "---====$=========r========$",
+                "+++$=ho$===ho====r========$",
+                "+++$=me$===me====r--------$",
+                "+++$=t|$====//////3=======$",
+                "+++$=t|$vvvv===vvr|=======$",
+                "kl+$=t|<--------->|=======$",
+                "bbb===c///////////2=======$",
+                "+++$======================$",
+                "+++$======================$",
+                "+++<----------------------$",
+                "++++++++++++++++++++++++++$",
+                "++++++++++++++++++++++++++$",
+
+
+            ], {
+                tileWidth: 64,
+                tileHeight: 64,
+                tiles: {
+                    "=": () => [
+                        sprite("grass"),
+                    ],
+                    "^": () => [
+                        sprite("house"),
+                        area(),
+                    ],
+                    "*": () => [
+                        sprite("houseDown"),
+                        area(),
+                    ],
+                    "+": () => [
+                        sprite("water"),
+                        area(),
+                        //body({ isStatic: true }),
+                    ],
+                    "b": () => [
+                        sprite("bridge"),
+                        area(),
+                    ],
+                    "-": () => [
+                        sprite("border"),
+                        area(),
+                        //body({ isStatic: true }),
+                    ],
+                    "$": () => [
+                        sprite("borderLeft"),
+                        area(),
+                        //body({ isStatic: true }),
+                    ],
+                    "<": () => [
+                        sprite("leftCorner"),
+                        area(),
+                    ],
+                    "h": () => [
+                        sprite("house1"),
+                        area(),
+                    ],
+                    "o": () => [
+                        sprite("house2"),
+                        area(),
+                    ],
+                    "m": () => [
+                        sprite("house3"),
+                        area(),
+                    ],
+                    "e": () => [
+                        sprite("house4"),
+                        area(),
+                    ],
+                    "/": () => [
+                        sprite("road"),
+                        area(),
+                    ],
+                    "|": () => [
+                        sprite("pathUp"),
+                        area(),
+                    ],
+                    "c": () => [
+                        sprite("pathCorner"),
+                        area(),
+                    ],
+                    "t": () => [
+                        sprite("pinkTree"),
+                        area(),
+
+                    ],
+                    "r": () => [
+                        sprite("borderRight"),
+                        area(),
+                        //body({ isStatic: true }),
+
+                    ],
+                    ">": () => [
+                        sprite("rightCorner"),
+                        area(),
+
+                    ],
+                    "v": () => [
+                        sprite("tree"),
+                        area(),
+
+                    ],
+                    "3": () => [
+                        sprite("road3"),
+                        area(),
+
+                    ],
+                    "2": () => [
+                        sprite("road2"),
+                        area(),
+
+                    ],
+                    "k": () => [
+                        sprite("boat1"),
+                        area(),
+
+                    ],
+                    "l": () => [
+                        sprite("boat2"),
+                        area(),
+
+                    ],
+                    "g": () => [
+                        sprite("ghost"),
+                        area(),
+
+                    ],
+                }
+            })
+            // const player = add([
+                
+            //     pos(200, 370),
+            //     area(),
+            //     body(),
+            //     outline(),
+            //     "player"
+            // ])
+            
+        })
+
+
+        go("main");
+
+    </script>
+</body>
+
+</html>

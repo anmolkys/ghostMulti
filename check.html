@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login : Ghosty</title>
+    <link rel="stylesheet" href="check.css">
+</head>
+
+<body>
+    <div class="loginContainer">
+        <div class="card">
+            <h2>Ghosty 👻</h2>
+            <form>
+                <input type="text" id="username" placeholder="username" required>
+                <input type="password" id="password" placeholder="password" required>
+                <button type="submit" id="submit">Login</button>
+                <button id="signup">SignUp</button>
+                <label id="alerter"></label>
+            </form>
+        </div>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        let submit = document.getElementById("submit");
+        submit.onclick = (e) => {
+            let username = document.getElementById("username").value;
+            let password = document.getElementById("password").value;
+            e.preventDefault();
+            socket.emit("check", { username: username, password: password });
+        }
+        socket.on("success", (data) => {
+            let username = document.getElementById("username").value;
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("name", username);
+            let alert = document.getElementById("alerter")
+            alert.innerHTML="Success";
+            alert.style.color="green";
+            alert.style.textAlign="center"
+            alert.style.marginTop="20px"
+            alert.style.font="Times New Roman 10px"
+            window.location.replace("/game");
+        })
+        socket.on("wrong", () => {
+            let alert = document.getElementById("alerter")
+            alert.innerHTML="Wrong Credentials !";
+            alert.style.color="red";
+            alert.style.textAlign="center"
+            alert.style.marginTop="20px"
+            alert.style.font="Times New Roman 10px"
+
+        })
+
+    </script>
+</body>
+
+</html>
