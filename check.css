@@ -54,6 +54,7 @@ body {
   }
   
   button {
+    margin-top: 10px;
     background-color: #3498db;
     color: #fff;
     padding: 10px;
